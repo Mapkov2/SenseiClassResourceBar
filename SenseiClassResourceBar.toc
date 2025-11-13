@@ -1,0 +1,10 @@
+## Interface: 120000
+## Title: Sensei Class Resource Bar
+## Notes: Separate resource bar for some classes
+## Author: Sensei
+## Version: 1.0
+## SavedVariables: ResourceBarDB, SecondaryResourceBarDB
+
+Libs\LibStub\LibStub.lua
+Libs\LibEditMode\embed.xml
+SenseiClassResourceBar.lua
