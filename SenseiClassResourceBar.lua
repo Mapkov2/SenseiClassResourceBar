@@ -117,7 +117,6 @@ local tickedPowerTypes = {
 local fragmentedPowerTypes = {
     --[Enum.PowerType.Essence] = true,
     [Enum.PowerType.Runes] = true,
-    --[Enum.PowerType.SoulShards] = true,
 }
 
 ------------------------------------------------------------
@@ -312,6 +311,15 @@ barConfigs.secondary = {
             end
             
             return totalRunes, readyCount, readyCount, "number"
+        end
+
+        if resource == Enum.PowerType.SoulShards then
+            local currentDisplay = UnitPower("player", resource)
+            local current = UnitPower("player", resource, true)
+            local max = UnitPowerMax("player", resource, true)
+            if max <= 0 then return nil, nil, nil, nil end
+
+            return max, current, currentDisplay, "number"
         end
 
         -- Regular secondary resource types
