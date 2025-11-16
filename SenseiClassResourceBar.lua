@@ -979,7 +979,7 @@ local function CreateBarInstance(config, parent)
         end
 
         -- Arbitrarily show 4 ticks for edit mode for preview, if spec does not support it
-        if LEM:IsInEditMode() and data.showTicks == true and type(resource) == "number" and not tickedPowerTypes[resource] then
+        if LEM:IsInEditMode() and data.showTicks == true and type(resource) ~= "string" and tickedPowerTypes[resource] == nil then
             max = 5
             resource = Enum.PowerType.ComboPoints
         end
