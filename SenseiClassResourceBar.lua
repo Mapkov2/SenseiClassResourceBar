@@ -1197,7 +1197,7 @@ local function CreateBarInstance(config, parent, frameLevel)
                 if color.hasClassResourceVariant then
                     fgTexture = "UI-HUD-UnitFrame-Player-PortraitOn-ClassResource-Bar-"..color.atlasElementName
                 else
-                fgTexture = "UI-HUD-UnitFrame-Player-PortraitOn-Bar-"..color.atlasElementName
+                    fgTexture = "UI-HUD-UnitFrame-Player-PortraitOn-Bar-"..color.atlasElementName
                 end
             elseif color.atlas then
                 fgTexture = color.atlas
