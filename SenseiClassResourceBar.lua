@@ -202,6 +202,7 @@ local barConfigs = {}
 barConfigs.primary = {
     dbName = "PrimaryResourceBarDB",
     name = "Primary Resource Bar",
+    frameLevel = 2,
     defaultValues = {
         point = "CENTER",
         x = 0,
@@ -303,6 +304,7 @@ barConfigs.primary = {
 barConfigs.secondary = {
     dbName = "SecondaryResourceBarDB",
     name = "Secondary Resource Bar",
+    frameLevel = 1,
     defaultValues = {
         point = "CENTER",
         x = 0,
@@ -497,6 +499,7 @@ barConfigs.secondary = {
 barConfigs.healthBar = {
     dbName = "healthBarDB",
     name = "Health Bar",
+    frameLevel = 0,
     defaultValues = {
         point = "CENTER",
         x = 0,
@@ -574,7 +577,7 @@ barConfigs.healthBar = {
 ------------------------------------------------------------
 -- BAR FACTORY
 ------------------------------------------------------------
-local function CreateBarInstance(config, parent)
+local function CreateBarInstance(config, parent, frameLevel)
     -- Initialize database
     if not SenseiClassResourceBarDB[config.dbName] then
         SenseiClassResourceBarDB[config.dbName] = {}
@@ -582,6 +585,7 @@ local function CreateBarInstance(config, parent)
 
     -- Create frame
     local frame = CreateFrame("Frame", config.name, parent or UIParent)
+    frame:SetFrameLevel(frameLevel)
     frame.config = config
     frame.barName = config.name
 
@@ -594,7 +598,7 @@ local function CreateBarInstance(config, parent)
     frame.statusBar = CreateFrame("StatusBar", nil, frame)
     frame.statusBar:SetAllPoints()
     frame.statusBar:SetStatusBarTexture(LSM:Fetch(LSM.MediaType.STATUSBAR, "SCRB FG Fade Left"))
-    frame.statusBar:SetFrameLevel(1)
+    frame.statusBar:SetFrameLevel(frame:GetFrameLevel())
 
     -- MASK
     frame.mask = frame.statusBar:CreateMaskTexture()
@@ -656,7 +660,7 @@ local function CreateBarInstance(config, parent)
                 end
                 bar:GetStatusBarTexture():AddMaskTexture(self.mask)
                 bar:SetOrientation("HORIZONTAL")
-                bar:SetFrameLevel(1)
+                bar:SetFrameLevel(self.statusBar:GetFrameLevel())
                 self.fragmentedPowerBars[i] = bar
                 
                 -- Create text for reload time display
@@ -1877,13 +1881,13 @@ end
 ------------------------------------------------------------
 local barInstances = {}
 
-local function InitializeBar(config)
+local function InitializeBar(config, frameLevel)
     local defaults = CopyTable(commonDefaults)
     for k, v in pairs(config.defaultValues or {}) do
         defaults[k] = v
     end
 
-    local frame = CreateBarInstance(config, UIParent)
+    local frame = CreateBarInstance(config, UIParent, math.max(0, (frameLevel or 0)) * 10)
     barInstances[config.name] = frame
 
     local function OnPositionChanged(frame, layoutName, point, x, y)
@@ -1945,12 +1949,8 @@ SCRB:SetScript("OnEvent", function(_, event, arg1)
             SenseiClassResourceBarDB = {}
         end
 
-        -- Initialize primary bar
-        InitializeBar(barConfigs.primary)
-
-        -- Initialize secondary bar
-        InitializeBar(barConfigs.secondary)
-
-        InitializeBar(barConfigs.healthBar)
+        for _, config in pairs(barConfigs) do
+            InitializeBar(config, config.frameLevel or 0)
+        end
     end
 end)
