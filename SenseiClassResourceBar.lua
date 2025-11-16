@@ -344,6 +344,9 @@ barConfigs.secondary = {
         end
 
         if resource == "SOUL" then
+            -- The hack needs the PlayerFrame
+            if not PlayerFrame:IsShown() then return nil, nil, nil, nil end
+
             local current = DemonHunterSoulFragmentsBar:GetValue() 
             local _, max = DemonHunterSoulFragmentsBar:GetMinMaxValues() -- Secret values
 
@@ -795,8 +798,8 @@ local function CreateBarInstance(config, parent)
                 -- White bar, "0" text for edit mode is resource does not exist (e.g. Secondary resource for warrior)
                 self.textValue:SetText("0")
                 self.statusBar:SetStatusBarColor(1, 1, 1)
-                self.statusBar:SetMinMaxValues(0, 1)
-                self.statusBar:SetValue(1)
+                self.statusBar:SetMinMaxValues(0, 5)
+                self.statusBar:SetValue(5)
             end
             return
         end
@@ -997,6 +1000,9 @@ local function CreateBarInstance(config, parent)
         local data = SenseiClassResourceBarDB[self.config.dbName][layoutName]
         if not data then return end
 
+        self:HideBlizzardPlayerContainer(layoutName)
+        self:HideBlizzardSecondaryResource(layoutName)
+
         -- Don't hide while in edit mode
         if LEM:IsInEditMode() then
             self:Show()
@@ -1032,8 +1038,6 @@ local function CreateBarInstance(config, parent)
         end
 
         self:ApplyTextVisibilitySettings(layoutName)
-        self:HideBlizzardPlayerContainer(layoutName)
-        self:HideBlizzardSecondaryResource(layoutName)
     end
 
     function frame:ApplyTextVisibilitySettings(layoutName)
@@ -1053,11 +1057,19 @@ local function CreateBarInstance(config, parent)
         local data = SenseiClassResourceBarDB[self.config.dbName][layoutName]
         if not data then return end
 
-        if data.hideBlizzardPlayerContainerUi == nil then return end
+        -- InCombatLockdown() means protected frames so we cannot touch it
+        if data.hideBlizzardPlayerContainerUi == nil or InCombatLockdown() then return end
 
         if PlayerFrame then
-            PlayerFrame.PlayerFrameContainer:SetAlpha(data.hideBlizzardPlayerContainerUi and 0 or 1)
-            PlayerFrame.PlayerFrameContent:SetAlpha(data.hideBlizzardPlayerContainerUi and 0 or 1)
+            if data.hideBlizzardPlayerContainerUi then
+                if LEM:IsInEditMode() then
+                    PlayerFrame:Show()
+                else 
+                    PlayerFrame:Hide()
+                end
+            else
+                PlayerFrame:Show()
+            end
         end
     end
     
@@ -1068,24 +1080,28 @@ local function CreateBarInstance(config, parent)
 
         if data.hideBlizzardSecondaryResourceUi == nil then return end
         
+        local playerClass = select(2, UnitClass("player"))
         local blizzardResourceFrames = {
-            DruidComboPointBarFrame,
-            EssencePlayerFrame,
-            MageArcaneChargesFrame,
-            MonkHarmonyBarFrame,
-            PaladinPowerBarFrame,
-            RogueComboPointBarFrame,
-            RuneFrame,
-            WarlockPowerFrame,
+            ["DEATHKNIGHT"] = RuneFrame,
+            ["DRUID"] = DruidComboPointBarFrame,
+            ["EVOKER"] = EssencePlayerFrame,
+            ["MAGE"] = MageArcaneChargesFrame,
+            ["MONK"] = MonkHarmonyBarFrame,
+            ["PALADIN"] = PaladinPowerBarFrame,
+            ["ROGUE"] = RogueComboPointBarFrame,
+            ["WARLOCK"] = WarlockPowerFrame,
         }
 
-        for _, k in ipairs(blizzardResourceFrames) do
-            if k then
-                k:SetAlpha(data.hideBlizzardSecondaryResourceUi and 0 or 1)
+        for class, f in ipairs(blizzardResourceFrames) do
+            if f and playerClass == class then
+                if data.hideBlizzardSecondaryResourceUi then
+                    f:Hide()
+                else
+                    f:Show()
+                end
             end
         end
     end
-
 
     function frame:EnableSmoothProgress()
         self.smoothEnabled = true
