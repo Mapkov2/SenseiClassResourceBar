@@ -1970,6 +1970,23 @@ local function InitializeBar(config, frameLevel)
     end
 
     LEM:RegisterCallback("enter", function()
+        -- Support for Edit Mode Transparency from BetterBlizzFrames
+        if not frame._SCRB_EditModeAlphaSlider_hooked and BBF and BBF.EditModeAlphaSlider then
+            BBF.EditModeAlphaSlider:RegisterCallback("OnValueChanged", function(_, value)
+                local rounded = math.floor((value / 0.05) + 0.5) * 0.05
+                
+                if frame and frame.Selection then
+                    frame.Selection:SetAlpha(rounded)
+                end
+            end, frame._SCRB_EditModeAlphaSlider)
+
+            if BetterBlizzFramesDB and BetterBlizzFramesDB["editModeSelectionAlpha"] then
+                BBF.EditModeAlphaSlider:TriggerEvent("OnValueChanged", BetterBlizzFramesDB["editModeSelectionAlpha"])
+            end
+
+            frame._SCRB_EditModeAlphaSlider_hooked = true
+        end
+
         frame:ApplyLayout()
         frame:ApplyVisibilitySettings()
         frame:UpdateDisplay()
