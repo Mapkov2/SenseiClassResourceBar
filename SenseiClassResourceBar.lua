@@ -944,23 +944,20 @@ local function CreateBarInstance(config, parent, frameLevel)
                         runeFrame:SetPoint("LEFT", self, "LEFT", (pos - 1) * fragmentedBarWidth, 0)
                     end
 
+                    runeFrame:SetMinMaxValues(0, 1)
                     if readyLookup[runeIndex] then
-                        runeFrame:SetMinMaxValues(0, 1)
                         runeFrame:SetValue(1)
                         runeText:SetText("")
                         runeFrame:SetStatusBarColor(color.r, color.g, color.b)
                     else
                         local cdInfo = cdLookup[runeIndex]
+                        runeFrame:SetStatusBarColor(color.r * 0.5, color.g * 0.5, color.b * 0.5)
                         if cdInfo then
-                            runeFrame:SetMinMaxValues(0, 1)
                             runeFrame:SetValue(cdInfo.frac)
                             runeText:SetText(string.format("%.1f", math.max(0, cdInfo.remaining)))
-                            runeFrame:SetStatusBarColor(color.r * 0.5, color.g * 0.5, color.b * 0.5)
                         else
-                            runeFrame:SetMinMaxValues(0, 1)
                             runeFrame:SetValue(0)
                             runeText:SetText("")
-                            runeFrame:SetStatusBarColor(color.r * 0.5, color.g * 0.5, color.b * 0.5)
                         end
                     end
 
@@ -1635,8 +1632,8 @@ local function CreateBarInstance(config, parent, frameLevel)
             or event == "UPDATE_SHAPESHIFT_FORM"
             or (event == "PLAYER_SPECIALIZATION_CHANGED" and arg1 == "player") then
 
-            self:ApplyLayout()
             self:ApplyVisibilitySettings()
+            self:ApplyLayout()
             self:UpdateDisplay()
          
         elseif event == "PLAYER_REGEN_ENABLED" or event == "PLAYER_REGEN_DISABLED" or event == "PLAYER_TARGET_CHANGED" then
@@ -1655,8 +1652,8 @@ local function CreateBarInstance(config, parent, frameLevel)
         end
     end)
 
-    frame:ApplyLayout()
     frame:ApplyVisibilitySettings()
+    frame:ApplyLayout()
     frame:UpdateDisplay()
 
     return frame
@@ -2148,22 +2145,22 @@ local function InitializeBar(config, frameLevel)
             frame._SCRB_EditModeAlphaSlider_hooked = true
         end
 
-        frame:ApplyLayout()
         frame:ApplyVisibilitySettings()
+        frame:ApplyLayout()
         frame:UpdateDisplay()
     end)
 
     LEM:RegisterCallback("exit", function()
-        frame:ApplyLayout()
         frame:ApplyVisibilitySettings()
+        frame:ApplyLayout()
         frame:UpdateDisplay()
     end)
 
     LEM:RegisterCallback("layout", function(layoutName)
         SenseiClassResourceBarDB[config.dbName][layoutName] = SenseiClassResourceBarDB[config.dbName][layoutName] or CopyTable(defaults)
         frame:InitCooldownManagerWidthHook(layoutName)
-        frame:ApplyLayout(layoutName)
         frame:ApplyVisibilitySettings(layoutName)
+        frame:ApplyLayout(layoutName)
         frame:UpdateDisplay(layoutName)
     end)
 
@@ -2171,16 +2168,16 @@ local function InitializeBar(config, frameLevel)
     --     SenseiClassResourceBarDB[config.dbName][newLayoutName] = CopyTable(SenseiClassResourceBarDB[config.dbName][oldLayoutName])
     --     SenseiClassResourceBarDB[config.dbName] = SenseiClassResourceBarDB[config.dbName] or {}
     --     SenseiClassResourceBarDB[config.dbName].remove(oldLayoutName)
-    --     frame:ApplyLayout()
     --     frame:ApplyVisibilitySettings()
+    --     frame:ApplyLayout()
     --     frame:UpdateDisplay()
     -- end)
 
     -- LEM:RegisterCallback("delete", function(layoutName)
     --     SenseiClassResourceBarDB[config.dbName] = SenseiClassResourceBarDB[config.dbName] or {}
     --     SenseiClassResourceBarDB[config.dbName].remove(layoutName)
-    --     frame:ApplyLayout()
     --     frame:ApplyVisibilitySettings()
+    --     frame:ApplyLayout()
     --     frame:UpdateDisplay()
     -- end)
 
