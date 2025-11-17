@@ -885,6 +885,8 @@ local function CreateBarInstance(config, parent, frameLevel)
     end
 
     function frame:UpdateDisplay(layoutName)
+        if not self:IsShown() then return end
+
         layoutName = layoutName or LEM.GetActiveLayoutName() or "Default"
         local data = SenseiClassResourceBarDB[self.config.dbName][layoutName]
         if not data then return end
@@ -918,13 +920,6 @@ local function CreateBarInstance(config, parent, frameLevel)
             self.TextValue:SetText(string.format("%.0f%%", displayValue))
         else
             self.TextValue:SetText(AbbreviateNumbers(displayValue))
-        end
-
-        local color = self.config.getBarColor(resource, frame)
-        if (data.usePrimaryResourceAtlas == true or data.useSecondaryResourceAtlas == true) and (color.atlasElementName or color.atlas) then
-            self.StatusBar:SetStatusBarColor(1, 1, 1);
-        else
-            self.StatusBar:SetStatusBarColor(color.r or 1, color.g or 1, color.b or 1);
         end
 
         if fragmentedPowerTypes[resource] then
@@ -969,15 +964,15 @@ local function CreateBarInstance(config, parent, frameLevel)
         -- Re-anchor the text inside the text frame depending on alignment
         self.TextValue:ClearAllPoints()
         if align == "LEFT" then
-            self.TextValue:SetPoint("LEFT", frame.TextFrame, "LEFT", 4, 0)
+            self.TextValue:SetPoint("LEFT", self.TextFrame, "LEFT", 4, 0)
         elseif align == "RIGHT" then
-            self.TextValue:SetPoint("RIGHT", frame.TextFrame, "RIGHT", -4, 0)
+            self.TextValue:SetPoint("RIGHT", self.TextFrame, "RIGHT", -4, 0)
         elseif align == "TOP" then
-            self.TextValue:SetPoint("TOP", frame.TextFrame, "TOP", 0, -4)
+            self.TextValue:SetPoint("TOP", self.TextFrame, "TOP", 0, -4)
         elseif align == "BOTTOM" then
-            self.TextValue:SetPoint("BOTTOM", frame.TextFrame, "BOTTOM", 0, 4)
+            self.TextValue:SetPoint("BOTTOM", self.TextFrame, "BOTTOM", 0, 4)
         else -- Center
-            self.TextValue:SetPoint("CENTER", frame.TextFrame, "CENTER", 0, 0)
+            self.TextValue:SetPoint("CENTER", self.TextFrame, "CENTER", 0, 0)
         end
     end
 
@@ -1217,11 +1212,17 @@ local function CreateBarInstance(config, parent, frameLevel)
         end
         
         if fgTexture then
-            frame.StatusBar:SetStatusBarTexture(fgTexture)
+            self.StatusBar:SetStatusBarTexture(fgTexture)
 
             for _, fragmentedPowerBar in ipairs(self.FragmentedPowerBars) do
                 fragmentedPowerBar:SetStatusBarTexture(fgTexture)
             end
+        end
+
+        if (data.usePrimaryResourceAtlas == true or data.useSecondaryResourceAtlas == true) and (color.atlasElementName or color.atlas) then
+            self.StatusBar:SetStatusBarColor(1, 1, 1);
+        else
+            self.StatusBar:SetStatusBarColor(color.r or 1, color.g or 1, color.b or 1);
         end
     end
 
@@ -1275,7 +1276,7 @@ local function CreateBarInstance(config, parent, frameLevel)
         local data = SenseiClassResourceBarDB[self.config.dbName][layoutName]
         if not data then return end
 
-        frame.TextFrame:SetShown(data.showText ~= false)
+        self.TextFrame:SetShown(data.showText ~= false)
 
         for _, fragmentedPowerBarText in ipairs(self.FragmentedPowerBarTexts) do
             fragmentedPowerBarText:SetShown(data.showFragmentedPowerBarText ~= false)
@@ -1340,48 +1341,58 @@ local function CreateBarInstance(config, parent, frameLevel)
 
     function frame:EnableSmoothProgress()
         self.smoothEnabled = true
-        self:SetScript("OnUpdate", function(_, delta)
-            if not self.smoothEnabled then return end
-            self.elapsed = self.elapsed + delta
-            if self.elapsed >= self.updateInterval then
-                self.elapsed = 0
-                self:UpdateDisplay()
-            end
-        end)
+        self:UnregisterEvent("UNIT_POWER_UPDATE")
+        self:RegisterUnitEvent("UNIT_POWER_FREQUENT", "player")
     end
 
     function frame:DisableSmoothProgress()
         self.smoothEnabled = false
-        self:SetScript("OnUpdate", nil)
+        self:UnregisterEvent("UNIT_POWER_FREQUENT")
+        self:RegisterUnitEvent("UNIT_POWER_UPDATE", "player")
     end
 
-    function frame:InitCooldownManagerWidthHook()
+    function frame:InitCooldownManagerWidthHook(layoutName)
+        layoutName = layoutName or LEM.GetActiveLayoutName() or "Default"
+        local data = SenseiClassResourceBarDB[self.config.dbName][layoutName]
+        if not data then return nil end
+
+        self._SCRB_Essential_Utility_hook_widthMode = data.widthMode
+
         local v = _G["EssentialCooldownViewer"]
         if v and not (self._SCRB_Essential_hooked or false) then
-            v:HookScript("OnSizeChanged", function()
-                self:ApplyLayout()
-            end)
-            v:HookScript("OnShow", function()
-                self:ApplyLayout()
-            end)
-            v:HookScript("OnHide", function()
-                self:ApplyLayout()
-            end)
+            local hookEssentialCooldowns = function(_, width)
+                if self._SCRB_Essential_Utility_hook_widthMode ~= "Sync With Essential Cooldowns" then
+                    return
+                end
+
+                -- For some weird reasons, this is triggered with the scale or something ?
+                if (width == nil) or (type(width) == "number" and math.floor(width) > 1) then
+                    self:ApplyLayout()
+                end
+            end
+
+            v:HookScript("OnSizeChanged", hookEssentialCooldowns)
+            v:HookScript("OnShow", hookEssentialCooldowns)
+            v:HookScript("OnHide", hookEssentialCooldowns)
 
             self._SCRB_Essential_hooked = true
         end
 
         v = _G["UtilityCooldownViewer"]
         if v and not (self._SCRB_Utility_hooked or false) then
-            v:HookScript("OnSizeChanged", function(_, width)
-                self:ApplyLayout()
-            end)
-            v:HookScript("OnShow", function()
-                self:ApplyLayout()
-            end)
-            v:HookScript("OnHide", function()
-                self:ApplyLayout()
-            end)
+            local hookUtilityCooldowns = function(width)
+                if self._SCRB_Essential_Utility_hook_widthMode ~= "Sync With Utility Cooldowns" then
+                    return
+                end
+
+                if (width == nil) or (type(width) == "number" and math.floor(width) > 1) then
+                    self:ApplyLayout()
+                end
+            end
+
+            v:HookScript("OnSizeChanged", hookUtilityCooldowns)
+            v:HookScript("OnShow", hookUtilityCooldowns)
+            v:HookScript("OnHide", hookUtilityCooldowns)
 
             self._SCRB_Utility_hooked = true
         end
@@ -1408,6 +1419,8 @@ local function CreateBarInstance(config, parent, frameLevel)
     end
 
     function frame:ApplyLayout(layoutName)
+        if not self:IsShown() then return end
+
         layoutName = layoutName or LEM.GetActiveLayoutName() or "Default"
         local data = SenseiClassResourceBarDB[self.config.dbName][layoutName]
         if not data then return end
@@ -1459,9 +1472,8 @@ local function CreateBarInstance(config, parent, frameLevel)
     local playerClass = select(2, UnitClass("player"))
     
     frame:RegisterEvent("PLAYER_ENTERING_WORLD")
-    frame:RegisterEvent("UNIT_POWER_UPDATE")
-    frame:RegisterEvent("UNIT_MAXPOWER")
-    frame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+    frame:RegisterUnitEvent("UNIT_MAXPOWER", "player")
+    frame:RegisterUnitEvent("PLAYER_SPECIALIZATION_CHANGED", "player")
     frame:RegisterEvent("PLAYER_REGEN_ENABLED")
     frame:RegisterEvent("PLAYER_REGEN_DISABLED")
     frame:RegisterEvent("PLAYER_TARGET_CHANGED")
@@ -1473,14 +1485,6 @@ local function CreateBarInstance(config, parent, frameLevel)
     end
 
     frame:SetScript("OnEvent", function(self, event, arg1)
-        -- No need to compute stuff for disabled bar
-        local layoutName = LEM.GetActiveLayoutName()
-        if layoutName and not LEM:IsInEditMode() then
-            local data = SenseiClassResourceBarDB[self.config.dbName][layoutName]
-            if data and data.barVisible == "Hidden" then
-                return
-            end
-        end
         
         if event == "PLAYER_ENTERING_WORLD"
             or event == "UPDATE_SHAPESHIFT_FORM"
@@ -1495,7 +1499,7 @@ local function CreateBarInstance(config, parent, frameLevel)
                 self:ApplyVisibilitySettings(nil, event == "PLAYER_REGEN_DISABLED")
                 self:UpdateDisplay()
 
-        elseif ((event == "UNIT_POWER_UPDATE" or event == "UNIT_MAXPOWER") and arg1 == "player")
+        elseif ((event == "UNIT_POWER_FREQUENT" or event == "UNIT_POWER_UPDATE" or event == "UNIT_MAXPOWER") and arg1 == "player")
                 or event == "RUNE_POWER_UPDATE" then
             
             self:UpdateDisplay()
@@ -2012,7 +2016,7 @@ local function InitializeBar(config, frameLevel)
 
     LEM:RegisterCallback("layout", function(layoutName)
         SenseiClassResourceBarDB[config.dbName][layoutName] = SenseiClassResourceBarDB[config.dbName][layoutName] or CopyTable(defaults)
-        frame:InitCooldownManagerWidthHook()
+        frame:InitCooldownManagerWidthHook(layoutName)
         frame:ApplyLayout(layoutName)
         frame:ApplyVisibilitySettings(layoutName)
         frame:UpdateDisplay(layoutName)
