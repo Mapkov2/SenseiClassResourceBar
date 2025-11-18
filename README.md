@@ -58,7 +58,8 @@ Each bar (Primary & Secondary) has its own configuration:
 *   📏 Adjustable **width**, **height**, and **overall scale**
 *   ✏️ Customizable **font**, **size**, and **outline**
 *   🖼 Multiple **foreground textures**, **backgrounds**, and **border styles**
-*   🎯 Text alignment (Left / Center / Right)
+*   🎯 Text alignment (Left / Center / Right), Font, Size
+*   🎨 All the resources color are editable
 *   ⭐ Support for LibSharedMedia-3.0
 
 ### **Behavior**
@@ -83,8 +84,8 @@ Each bar (Primary & Secondary) has its own configuration:
 ### **Advanced**
 
 *   🔗 Width syncing with the Cooldown Manager :
-    * Essential Cooldowns
-    * Utility Cooldowns
+    *   Essential Cooldowns
+    *   Utility Cooldowns
 
 ***
 
