@@ -3,7 +3,7 @@ local _, addonTable = ...
 addonTable.LSM = LibStub("LibSharedMedia-3.0")
 local LSM = addonTable.LSM
 
-addonTable.LEM = LibStub("LibEditMode")
+addonTable.LEM = LibStub("LibEditMode-SCRBFork")
 
 ------------------------------------------------------------
 -- LIBSHAREDMEDIA INTEGRATION

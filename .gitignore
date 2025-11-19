@@ -1,3 +1,4 @@
 .vscode/
 Libs/*
 !Libs/LibEditMode
+!LibEditMode-SCRBFork

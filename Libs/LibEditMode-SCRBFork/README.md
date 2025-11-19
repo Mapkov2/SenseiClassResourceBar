@@ -1,4 +1,6 @@
-# LibEditMode
+# LibEditMode - FORK FOR SenseiClassResourceBar
+
+**Original is here : https://github.com/p3lim-wow/LibEditMode by p3lim -- I only changed the LibStub to not break other addons. I do NOT intend nor will make any changes other than through PR on the official repo. I am just a bit impatient and want to use the new tools early**
 
 This is a library addon for the popular MMORPG "World of Warcraft.
 

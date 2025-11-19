@@ -1,5 +1,5 @@
 local MINOR = 11
-local lib = LibStub:NewLibrary('LibEditMode', MINOR)
+local lib = LibStub:NewLibrary('LibEditMode-SCRBFork', MINOR)
 if not lib then
 	-- this or a newer version is already loaded
 	return

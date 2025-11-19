@@ -21,7 +21,7 @@ local defaultPosition = {
 	y = 0,
 }
 
-local LEM = LibStub('LibEditMode')
+local LEM = LibStub('LibEditMode-SCRBFork')
 LEM:AddFrame(button, onPositionChanged, defaultPosition)
 
 LEM:RegisterCallback('layout', function(layoutName)

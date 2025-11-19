@@ -1,6 +1,6 @@
 local _, addonTable = ...
 
-local LEM = addonTable.LEM or LibStub("LibEditMode")
+local LEM = addonTable.LEM or LibStub("LibEditMode-SCRBFork")
 
 local PrimaryResourceBarMixin = Mixin({}, addonTable.PowerBarMixin)
 local buildVersion = select(4, GetBuildInfo())
