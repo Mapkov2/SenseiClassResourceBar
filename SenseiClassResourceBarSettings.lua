@@ -1,8 +1,5 @@
 local addonName, addonTable = ...
 
-local version = GetBuildInfo()
-local addonCategoryId = "SenseiClassResourceBar_Addon_Category"
-
 local function Register()
 	if not SenseiClassResourceBarDB then
 		SenseiClassResourceBarDB = {}

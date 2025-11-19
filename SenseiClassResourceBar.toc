@@ -8,6 +8,6 @@
 
 ## X-Curse-Project-ID: 1383623
 
+# Lib
 embeds.xml
-Settings\embeds.xml
 SenseiClassResourceBar.xml
