@@ -11,11 +11,7 @@ local function Register()
 		SenseiClassResourceBarDB["_Settings"] = {}
 	end
 
-	if not SenseiClassResourceBarDB["_Settings"]["NewFeaturesShown"] then
-		SenseiClassResourceBarDB["_Settings"]["NewFeaturesShown"] = {}
-	end
-
-	local rootCategory, layout = SettingsLib:CreateRootCategory(addonName)
+	local rootCategory = SettingsLib:CreateRootCategory(addonName)
     addonTable.rootSettingsCategory = rootCategory
 
 	local categories = {
@@ -26,22 +22,16 @@ local function Register()
 		local metadata = addonTable.FeaturesMetadata[feature] or {}
 		local settingsPanelInitializer = addonTable.SettingsPanelInitializers[feature] or nil
 		if metadata then
-			local data
-
-			-- Until we do everything with LibEQOL, we keep it that way
+			local category
 			if not metadata.category then
-				data = Mixin(metadata.data or {}, { categoryID = rootCategory:GetID() })
-
-				local initializer = Settings.CreatePanelInitializer(metadata.panel, data)
-				initializer:AddSearchTags(unpack(metadata.searchTags or {}))
-				layout:AddInitializer(initializer)
+				category = rootCategory
 			else
-				local category = categories[metadata.category] or SettingsLib:CreateCategory(rootCategory, metadata.category)
+				category = categories[metadata.category] or SettingsLib:CreateCategory(rootCategory, metadata.category)
 				categories[metadata.category] = category
+			end
 
-				if settingsPanelInitializer then
-					settingsPanelInitializer(category)
-				end
+			if settingsPanelInitializer then
+				settingsPanelInitializer(category)
 			end
 		end
     end

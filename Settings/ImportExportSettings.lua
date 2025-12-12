@@ -9,7 +9,6 @@ table.insert(addonTable.AvailableFeatures, featureId)
 
 addonTable.FeaturesMetadata = addonTable.FeaturesMetadata or {}
 addonTable.FeaturesMetadata[featureId] = {
-	searchTags = { "Import", "Export" },
 	category = "Import / Export",
 }
 

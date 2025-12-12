@@ -74,20 +74,20 @@ addonTable.commonDefaults = {
 }
 
 addonTable.availableBarVisibilityOptions = {
-    { text = "Always Visible", isRadio = true },
-    { text = "In Combat", isRadio = true },
-    { text = "Has Target Selected", isRadio = true },
-    { text = "Has Target Selected OR In Combat", isRadio = true },
-    { text = "Hidden", isRadio = true },
+    { text = "Always Visible" },
+    { text = "In Combat" },
+    { text = "Has Target Selected" },
+    { text = "Has Target Selected OR In Combat" },
+    { text = "Hidden" },
 }
 
 addonTable.availableBarStrataOptions = {
-    { text = "TOOLTIP" , isRadio = true },
-    { text = "DIALOG" , isRadio = true },
-    { text = "HIGH" , isRadio = true },
-    { text = "MEDIUM" , isRadio = true },
-    { text = "LOW" , isRadio = true },
-    { text = "BACKGROUND" , isRadio = true },
+    { text = "TOOLTIP"  },
+    { text = "DIALOG"  },
+    { text = "HIGH"  },
+    { text = "MEDIUM"  },
+    { text = "LOW"  },
+    { text = "BACKGROUND"  },
 }
 
 addonTable.availableRoleOptions = {
@@ -97,44 +97,44 @@ addonTable.availableRoleOptions = {
 }
 
 addonTable.availableWidthModes = {
-    { text = "Manual", isRadio = true },
-    { text = "Sync With Essential Cooldowns", isRadio = true },
-    { text = "Sync With Utility Cooldowns", isRadio = true },
+    { text = "Manual" },
+    { text = "Sync With Essential Cooldowns" },
+    { text = "Sync With Utility Cooldowns" },
 }
 
 addonTable.availableFillDirections = {
-    { text = "Left to Right", isRadio = true },
-    { text = "Right to Left", isRadio = true },
-    { text = "Top to Bottom", isRadio = true },
-    { text = "Bottom to Top", isRadio = true },
+    { text = "Left to Right" },
+    { text = "Right to Left" },
+    { text = "Top to Bottom" },
+    { text = "Bottom to Top" },
 }
 
 addonTable.availableOutlineStyles = {
-    { text = "NONE", isRadio = true },
-    { text = "OUTLINE", isRadio = true },
-    { text = "THICKOUTLINE", isRadio = true },
+    { text = "NONE" },
+    { text = "OUTLINE" },
+    { text = "THICKOUTLINE" },
 }
 
 addonTable.availableTextFormats = {
-    { text = "Current", isRadio = true },
-    { text = "Current / Maximum", isRadio = true },
-    { text = "Percent", isRadio = true },
-    { text = "Percent%", isRadio = true },
+    { text = "Current" },
+    { text = "Current / Maximum" },
+    { text = "Percent" },
+    { text = "Percent%" },
 }
 
 addonTable.availableTextPrecisions = {
-    { text = "12", isRadio = true },
-    { text = "12.3", isRadio = true },
-    { text = "12.34", isRadio = true },
-    { text = "12.345", isRadio = true },
+    { text = "12" },
+    { text = "12.3" },
+    { text = "12.34" },
+    { text = "12.345" },
 }
 
 addonTable.availableTextAlignmentStyles = {
-    { text = "TOP", isRadio = true },
-    { text = "LEFT", isRadio = true },
-    { text = "CENTER", isRadio = true },
-    { text = "RIGHT", isRadio = true },
-    { text = "BOTTOM", isRadio = true },
+    { text = "TOP" },
+    { text = "LEFT" },
+    { text = "CENTER" },
+    { text = "RIGHT" },
+    { text = "BOTTOM" },
 }
 
 addonTable.maskAndBorderStyles = {
@@ -171,7 +171,7 @@ addonTable.maskAndBorderStyles = {
 
 addonTable.availableMaskAndBorderStyles = {}
 for styleName, _ in pairs(addonTable.maskAndBorderStyles) do
-    table.insert(addonTable.availableMaskAndBorderStyles, { text = styleName, isRadio = true })
+    table.insert(addonTable.availableMaskAndBorderStyles, { text = styleName })
 end
 
 addonTable.backgroundStyles = {
