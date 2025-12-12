@@ -196,6 +196,7 @@ addonTable.tickedPowerTypes = {
 
 -- Power types that are fragmented (multiple independent segments)
 addonTable.fragmentedPowerTypes = {
+    [Enum.PowerType.ComboPoints] = true,
     [Enum.PowerType.Essence] = true,
     [Enum.PowerType.Runes] = true,
 }

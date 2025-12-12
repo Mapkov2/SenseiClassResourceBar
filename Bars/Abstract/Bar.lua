@@ -469,8 +469,19 @@ function BarMixin:ApplyLayout(layoutName, force)
 
     local resource = self:GetResource()
     if addonTable.fragmentedPowerTypes[resource] then
+        self.StatusBar:SetAlpha(0)
         self:CreateFragmentedPowerBars(layoutName)
         self:UpdateFragmentedPowerDisplay(layoutName)
+    else
+        self.StatusBar:SetAlpha(1)
+        for i, _ in pairs(self.FragmentedPowerBars or {}) do
+            if self.FragmentedPowerBars[i] then
+                self.FragmentedPowerBars[i]:Hide()
+                if self.FragmentedPowerBarTexts[i] then
+                    self.FragmentedPowerBarTexts[i]:SetText("")
+                end
+            end
+        end
     end
 end
 
@@ -830,13 +841,71 @@ function BarMixin:UpdateFragmentedPowerDisplay(layoutName)
     local fragmentedBarWidth = barWidth / maxPower
     local fragmentedBarHeight = barHeight / maxPower
 
-    -- Hide the main status bar fill (we display bars representing one (1) unit of resource each)
-    self.StatusBar:SetAlpha(0)
-
     local r, g, b = self.StatusBar:GetStatusBarColor()
     local color = { r = r, g = g, b = b }
 
-    if resource == Enum.PowerType.Essence then
+    if resource == Enum.PowerType.ComboPoints then
+        local current = UnitPower("player", resource)
+        local maxCP = UnitPowerMax("player", resource)
+
+        local overchargedCpColor = addonTable:GetOverrideResourceColor("OVERCHARGED_COMBO_POINTS") or color
+        local charged = GetUnitChargedPowerPoints("player") or {}
+        local chargedLookup = {}
+        for _, index in ipairs(charged) do
+            chargedLookup[index] = true
+        end
+
+        local displayOrder = {}
+        for i = 1, maxCP do
+            table.insert(displayOrder, i)
+        end
+
+        -- Reverse if needed
+        if data.fillDirection == "Right to Left" or data.fillDirection == "Bottom to Top" then
+            for i = 1, math.floor(#displayOrder / 2) do
+                displayOrder[i], displayOrder[#displayOrder - i + 1] = displayOrder[#displayOrder - i + 1], displayOrder[i]
+            end
+        end
+
+        for pos = 1, #displayOrder do
+            local idx = displayOrder[pos]
+            local cpFrame = self.FragmentedPowerBars[idx]
+            local cpText  = self.FragmentedPowerBarTexts[idx]
+
+            if cpFrame then
+                cpFrame:ClearAllPoints()
+                if self.StatusBar:GetOrientation() == "VERTICAL" then
+                    cpFrame:SetSize(barWidth, fragmentedBarHeight)
+                    cpFrame:SetPoint("BOTTOM", self.Frame, "BOTTOM", 0, (pos - 1) * fragmentedBarHeight)
+                else
+                    cpFrame:SetSize(fragmentedBarWidth, barHeight)
+                    cpFrame:SetPoint("LEFT", self.Frame, "LEFT", (pos - 1) * fragmentedBarWidth, 0)
+                end
+
+                cpFrame:SetMinMaxValues(0, 1)
+
+                if chargedLookup[idx] then
+                    cpFrame:SetValue(1, data.smoothProgress and buildVersion >= 120000 and Enum.StatusBarInterpolation.ExponentialEaseOut or nil)
+                    if idx <= current then
+                        cpFrame:SetStatusBarColor(overchargedCpColor.r, overchargedCpColor.g, overchargedCpColor.b)
+                    else
+                        cpFrame:SetStatusBarColor(overchargedCpColor.r * 0.5, overchargedCpColor.g * 0.5, overchargedCpColor.b * 0.5)
+                    end
+                else
+                    if idx <= current then
+                        cpFrame:SetValue(1, data.smoothProgress and buildVersion >= 120000 and Enum.StatusBarInterpolation.ExponentialEaseOut or nil)
+                        cpFrame:SetStatusBarColor(color.r, color.g, color.b)
+                    else
+                        cpFrame:SetValue(0, data.smoothProgress and buildVersion >= 120000 and Enum.StatusBarInterpolation.ExponentialEaseOut or nil)
+                        cpFrame:SetStatusBarColor(color.r * 0.5, color.g * 0.5, color.b * 0.5)
+                    end
+                end
+                cpText:SetText("")
+
+                cpFrame:Show()
+            end
+        end
+    elseif resource == Enum.PowerType.Essence then
         local current = UnitPower("player", resource)
         local maxEssence = UnitPowerMax("player", resource)
         local regenRate = GetPowerRegenForPowerType(resource) or 0.2
@@ -918,8 +987,6 @@ function BarMixin:UpdateFragmentedPowerDisplay(layoutName)
                 essFrame:Show()
             end
         end
-
-        self:ApplyFontSettings(layoutName)
     elseif resource == Enum.PowerType.Runes then
         -- Collect rune states: ready and recharging
         local readyList = {}
@@ -1002,8 +1069,9 @@ function BarMixin:UpdateFragmentedPowerDisplay(layoutName)
                 runeFrame:Show()
             end
         end
-        self:ApplyFontSettings(layoutName)
     end
+
+    self:ApplyFontSettings(layoutName)
 
     for i = maxPower + 1, #self.FragmentedPowerBars do
         if self.FragmentedPowerBars[i] then
