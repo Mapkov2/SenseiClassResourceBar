@@ -14,7 +14,7 @@ addonTable.LibDeflate = LibStub("LibDeflate")
 local function InitLSM()
     LSM:Register(LSM.MediaType.BACKGROUND, "SCRB BG Bevelled", [[Interface\AddOns\SenseiClassResourceBar\Textures\BarBackgrounds\bevelled.png]])
     LSM:Register(LSM.MediaType.BACKGROUND, "SCRB BG Bevelled Grey", [[Interface\AddOns\SenseiClassResourceBar\Textures\BarBackgrounds\bevelled-grey.png]])
-    
+
     LSM:Register(LSM.MediaType.STATUSBAR, "SCRB FG Fade Left", [[Interface\AddOns\SenseiClassResourceBar\Textures\BarForegrounds\fade-left.png]])
     LSM:Register(LSM.MediaType.STATUSBAR, "SCRB FG Fade Bottom", [[Interface\AddOns\SenseiClassResourceBar\Textures\BarForegrounds\fade-bottom.png]])
     LSM:Register(LSM.MediaType.STATUSBAR, "SCRB FG Fade Top", [[Interface\AddOns\SenseiClassResourceBar\Textures\BarForegrounds\fade-top.png]])
@@ -69,7 +69,9 @@ addonTable.commonDefaults = {
     fontOutline = "OUTLINE",
     textAlign = "CENTER",
     maskAndBorderStyle = "Thin",
+    borderColor = {r = 0, g = 0, b = 0, a = 1},
     backgroundStyle = "SCRB Semi-transparent",
+    backgroundColor = {r = 1, g = 1, b = 1, a = 1},
     foregroundStyle = "SCRB FG Fade Left",
 }
 

@@ -619,11 +619,14 @@ function BarMixin:ApplyMaskAndBorderSettings(layoutName)
         local thickness = (style.thickness or 1) * math.max(data.scale or defaults.scale, 1)
         thickness = math.max(thickness, 1)
 
+        local borderColor = data.borderColor or defaults.borderColor
+
         for edge, t in pairs(self.FixedThicknessBorders) do
             local points = bordersInfo[edge]
             t:ClearAllPoints()
             t:SetPoint(points[1], self.Frame, points[1])
             t:SetPoint(points[2], self.Frame, points[2])
+            t:SetColorTexture(borderColor.r or 0, borderColor.g or 0, borderColor.b or 0, borderColor.a or 1)
             if edge == "top" or edge == "bottom" then
                 t:SetHeight(thickness)
             else
@@ -638,6 +641,9 @@ function BarMixin:ApplyMaskAndBorderSettings(layoutName)
         self.Border:SetPoint("CENTER", self.StatusBar, "CENTER")
         self.Border:SetSize(verticalOrientation and height or width, verticalOrientation and width or height)
         self.Border:SetRotation(verticalOrientation and math.rad(90) or 0)
+
+        local borderColor = data.borderColor or defaults.borderColor
+        self.Border:SetVertexColor(borderColor.r or 0, borderColor.g or 0, borderColor.b or 0, borderColor.a or 1)
 
         if self.FixedThicknessBorders then
             for _, t in pairs(self.FixedThicknessBorders) do
@@ -687,11 +693,19 @@ function BarMixin:ApplyBackgroundSettings(layoutName)
 
     if not bgConfig then return end
 
+    local bgColor = data.backgroundColor or defaults.backgroundColor
+
     if bgConfig.type == "color" then
-        self.Background:SetColorTexture(bgConfig.r or 1, bgConfig.g or 1, bgConfig.b or 1, bgConfig.a or 1)
+        -- Blend bgColor with bgConfig color based on how close bgColor is to white
+        -- The closer bgColor is to white, the more bgConfig color shows through
+        local whitenessFactor = (bgColor.r + bgColor.g + bgColor.b) / 3
+        local resultR = (bgConfig.r or 1) * whitenessFactor + bgColor.r * (1 - whitenessFactor)
+        local resultG = (bgConfig.g or 1) * whitenessFactor + bgColor.g * (1 - whitenessFactor)
+        local resultB = (bgConfig.b or 1) * whitenessFactor + bgColor.b * (1 - whitenessFactor)
+        self.Background:SetColorTexture(resultR, resultG, resultB, (bgConfig.a or 1) * (bgColor.a or 1))
     elseif bgConfig.type == "texture" then
         self.Background:SetTexture(bgConfig.value)
-        self.Background:SetVertexColor(1, 1, 1, 1)
+        self.Background:SetVertexColor(bgColor.r or 1, bgColor.g or 1, bgColor.b or 1, bgColor.a or 1)
     end
 end
 
