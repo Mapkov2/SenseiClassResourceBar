@@ -469,7 +469,6 @@ function BarMixin:ApplyLayout(layoutName, force)
 
     local resource = self:GetResource()
     if addonTable.fragmentedPowerTypes[resource] then
-        self.StatusBar:SetAlpha(0)
         self:CreateFragmentedPowerBars(layoutName)
         self:UpdateFragmentedPowerDisplay(layoutName)
     else
@@ -881,6 +880,7 @@ function BarMixin:UpdateFragmentedPowerDisplay(layoutName)
             end
         end
 
+        self.StatusBar:SetAlpha(0)
         for pos = 1, #displayOrder do
             local idx = displayOrder[pos]
             local cpFrame = self.FragmentedPowerBars[idx]
@@ -963,6 +963,8 @@ function BarMixin:UpdateFragmentedPowerDisplay(layoutName)
             table.insert(displayOrder, i)
         end
 
+        self.StatusBar:SetValue(current)
+
         local precision = data.fragmentedPowerBarTextPrecision and math.max(0, string.len(data.fragmentedPowerBarTextPrecision) - 3) or 0
         for pos = 1, #displayOrder do
             local idx = displayOrder[pos]
@@ -983,22 +985,23 @@ function BarMixin:UpdateFragmentedPowerDisplay(layoutName)
                 essFrame:SetMinMaxValues(0, 1)
 
                 if state == "full" then
+                    essFrame:Hide()
                     essFrame:SetValue(1, data.smoothProgress and buildVersion >= 120000 and Enum.StatusBarInterpolation.ExponentialEaseOut or nil)
                     essFrame:SetStatusBarColor(color.r, color.g, color.b, color.a or 1)
                     essText:SetText("")
                 elseif state == "partial" then
+                    essFrame:Show()
                     local remaining = math.max(0, self._NextEssenceTick - now)
                     local value = 1 - (remaining / tickDuration)
                     essFrame:SetValue(value, data.smoothProgress and buildVersion >= 120000 and Enum.StatusBarInterpolation.ExponentialEaseOut or nil)
                     essFrame:SetStatusBarColor(color.r * 0.5, color.g * 0.5, color.b * 0.5, color.a or 1)
                     essText:SetText(string.format("%." .. (precision or 1) .. "f", remaining))
                 else
+                    essFrame:Show()
                     essFrame:SetValue(0, data.smoothProgress and buildVersion >= 120000 and Enum.StatusBarInterpolation.ExponentialEaseOut or nil)
                     essFrame:SetStatusBarColor(color.r * 0.5, color.g * 0.5, color.b * 0.5, color.a or 1)
                     essText:SetText("")
                 end
-
-                essFrame:Show()
             end
         end
     elseif resource == Enum.PowerType.Runes then
@@ -1046,6 +1049,8 @@ function BarMixin:UpdateFragmentedPowerDisplay(layoutName)
             end
         end
 
+        self.StatusBar:SetValue(#readyList)
+
         local precision = data.fragmentedPowerBarTextPrecision and math.max(0, string.len(data.fragmentedPowerBarTextPrecision) - 3) or 0
         for pos = 1, #displayOrder do
             local runeIndex = displayOrder[pos]
@@ -1065,10 +1070,12 @@ function BarMixin:UpdateFragmentedPowerDisplay(layoutName)
 
                 runeFrame:SetMinMaxValues(0, 1)
                 if readyLookup[runeIndex] then
+                    runeFrame:Hide()
                     runeFrame:SetValue(1, data.smoothProgress and buildVersion >= 120000 and Enum.StatusBarInterpolation.ExponentialEaseOut or nil)
                     runeText:SetText("")
                     runeFrame:SetStatusBarColor(color.r, color.g, color.b, color.a or 1)
                 else
+                    runeFrame:Show()
                     local cdInfo = cdLookup[runeIndex]
                     runeFrame:SetStatusBarColor(color.r * 0.5, color.g * 0.5, color.b * 0.5, color.a or 1)
                     if cdInfo then
@@ -1079,8 +1086,6 @@ function BarMixin:UpdateFragmentedPowerDisplay(layoutName)
                         runeText:SetText("")
                     end
                 end
-
-                runeFrame:Show()
             end
         end
     end
