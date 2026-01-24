@@ -39,7 +39,7 @@ function PrimaryResourceBarMixin:GetResource()
         ["ROGUE"]       = Enum.PowerType.Energy,
         ["SHAMAN"]      = {
             [262] = Enum.PowerType.Maelstrom, -- Elemental
-            [263] = "MAELSTROM_WEAPON", -- Enhancement
+            [263] = Enum.PowerType.Mana, -- Enhancement
             [264] = Enum.PowerType.Mana, -- Restoration
         },
         ["WARLOCK"]     = Enum.PowerType.Mana,
@@ -67,19 +67,6 @@ function PrimaryResourceBarMixin:GetResourceValue(resource)
 
     local data = self:GetData()
     if not data then return nil, nil, nil, nil, nil end
-
-    if resource == "MAELSTROM_WEAPON" then
-        local auraData = C_UnitAuras.GetPlayerAuraBySpellID(344179) -- Maelstrom Weapon
-        local current = auraData and auraData.applications or 0
-        local max = 10
-
-        -- The Maelstrom Weapon bar should be capped at 5, if it goes beyond that it's just a visual effect
-        if data.textFormat == "Percent" or data.textFormat == "Percent%" then
-            return max/2, max, current, math.floor((current / max) * 100 + 0.5), "percent"
-        else
-            return max/2, max, current, current, "number"
-        end
-    end
 
     -- Regular primary resource types
     local current = UnitPower("player", resource)
@@ -139,64 +126,6 @@ addonTable.RegisteredBar.PrimaryResourceBar = {
                     SenseiClassResourceBarDB[dbName][layoutName].hideManaOnRole = value
                 end,
                 tooltip = "Not effective on Arcane Mage",
-            },
-            {
-                parentId = "Bar Settings",
-                order = 304,
-                kind = LEM.SettingType.Divider,
-            },
-            {
-                parentId = "Bar Settings",
-                order = 305,
-                name = "Show Ticks When Available",
-                kind = LEM.SettingType.CheckboxColor,
-                default = defaults.showTicks,
-                colorDefault = defaults.tickColor,
-                get = function(layoutName)
-                    local data = SenseiClassResourceBarDB[dbName][layoutName]
-                    if data and data.showTicks ~= nil then
-                        return data.showTicks
-                    else
-                        return defaults.showTicks
-                    end
-                end,
-                colorGet = function(layoutName)
-                    local data = SenseiClassResourceBarDB[dbName][layoutName]
-                    return data and data.tickColor or defaults.tickColor
-                end,
-                set = function(layoutName, value)
-                    SenseiClassResourceBarDB[dbName][layoutName] = SenseiClassResourceBarDB[dbName][layoutName] or CopyTable(defaults)
-                    SenseiClassResourceBarDB[dbName][layoutName].showTicks = value
-                    bar:UpdateTicksLayout(layoutName)
-                end,
-                colorSet = function(layoutName, value)
-                    SenseiClassResourceBarDB[dbName][layoutName] = SenseiClassResourceBarDB[dbName][layoutName] or CopyTable(defaults)
-                    SenseiClassResourceBarDB[dbName][layoutName].tickColor = value
-                    bar:UpdateTicksLayout(layoutName)
-                end,
-            },
-            {
-                parentId = "Bar Settings",
-                order = 306,
-                name = "Tick Thickness",
-                kind = LEM.SettingType.Slider,
-                default = defaults.tickThickness,
-                minValue = 1,
-                maxValue = 5,
-                valueStep = 1,
-                get = function(layoutName)
-                    local data = SenseiClassResourceBarDB[dbName][layoutName]
-                    return data and data.tickThickness or defaults.tickThickness
-                end,
-                set = function(layoutName, value)
-                    SenseiClassResourceBarDB[dbName][layoutName] = SenseiClassResourceBarDB[dbName][layoutName] or CopyTable(defaults)
-                    SenseiClassResourceBarDB[dbName][layoutName].tickThickness = value
-                    bar:UpdateTicksLayout(layoutName)
-                end,
-                isEnabled = function(layoutName)
-                    local data = SenseiClassResourceBarDB[dbName][layoutName]
-                    return data.showTicks
-                end,
             },
             {
                 parentId = "Text Settings",

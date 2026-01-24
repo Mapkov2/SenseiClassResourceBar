@@ -33,7 +33,7 @@ function SecondaryResourceBarMixin:GetResource()
         ["ROGUE"]       = Enum.PowerType.ComboPoints,
         ["SHAMAN"]      = {
             [262]  = Enum.PowerType.Mana, -- Elemental
-            [263] =  Enum.PowerType.Mana, -- Enhancement
+            [263] = "MAELSTROM_WEAPON", -- Enhancement
         },
         ["WARLOCK"]     = Enum.PowerType.SoulShards,
         ["WARRIOR"]     = nil,
@@ -138,6 +138,19 @@ function SecondaryResourceBarMixin:GetResourceValue(resource)
             return max, max, current, math.floor((current / max) * 100 + 0.5), "percent"
         else
             return max, max / 10, current, current / 10, "number"
+        end
+    end
+
+    if resource == "MAELSTROM_WEAPON" then
+        local auraData = C_UnitAuras.GetPlayerAuraBySpellID(405189) -- Maelstrom Weapon
+        local current = auraData and auraData.applications or 0
+        local max = 10
+
+        -- The Maelstrom Weapon bar should be capped at 5, if it goes beyond that it's just a visual effect
+        if data.textFormat == "Percent" or data.textFormat == "Percent%" then
+            return max/2, max, current, math.floor((current / max) * 100 + 0.5), "percent"
+        else
+            return max/2, max, current, current, "number"
         end
     end
 
