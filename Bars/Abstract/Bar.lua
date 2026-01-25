@@ -507,7 +507,7 @@ function BarMixin:GetSize(layoutName)
 
     local height = data.height or defaults.height
 
-    local scale = addonTable.rounded(data.scale or defaults.scale or 1)
+    local scale = addonTable.rounded(data.scale or defaults.scale or 1, 2)
 
     return width * scale, height * scale
 end
