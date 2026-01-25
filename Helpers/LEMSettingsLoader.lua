@@ -857,7 +857,7 @@ function LEMSettingsLoaderMixin:Init(bar, defaults)
     end)
 
     LEM:RegisterCallback("layoutrenamed", function(oldLayoutName, newLayoutName)
-        SenseiClassResourceBarDB[config.dbName][newLayoutName] = CopyTable(SenseiClassResourceBarDB[config.dbName][oldLayoutName])
+        SenseiClassResourceBarDB[config.dbName][newLayoutName] = SenseiClassResourceBarDB[config.dbName][oldLayoutName] and CopyTable(SenseiClassResourceBarDB[config.dbName][oldLayoutName]) or CopyTable(defaults)
         SenseiClassResourceBarDB[config.dbName][oldLayoutName] = nil
         bar:InitCooldownManagerWidthHook(newLayoutName)
         bar:ApplyVisibilitySettings()
