@@ -532,7 +532,7 @@ function BarMixin:GetPoint(layoutName)
         resolvedRelativeFrame = UIParent
         data.relativeFrame = "UIParent"
         LEM.internal:RefreshSettingValues({L["RELATIVE_FRAME"]})
-        addonTable.prettyPrint(L["RELATIVE_FRAME_CYLIC_WARNING"])
+        addonTable.prettyPrint(L["RELATIVE_FRAME_CYCLIC_WARNING"])
     end
 
     local uiWidth, uiHeight = UIParent:GetWidth() / 2, UIParent:GetHeight() / 2
