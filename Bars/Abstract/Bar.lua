@@ -400,6 +400,11 @@ function BarMixin:ApplyVisibilitySettings(layoutName, inCombat)
     local data = self:GetData(layoutName)
     if not data then return end
 
+    -- Cannot touch Protected Frame in Combat
+    if self.Frame:IsProtected() and InCombatLockdown() then
+        return
+    end
+
     -- Don't hide while in edit mode...
     if LEM:IsInEditMode() then
         -- ...Unless config says otherwise

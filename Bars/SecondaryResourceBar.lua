@@ -59,7 +59,7 @@ function SecondaryResourceBarMixin:GetResource()
         },
         ["WARLOCK"]     = Enum.PowerType.SoulShards,
         ["WARRIOR"]     = {
-            [72] = "WHIRLWIND",
+            [72] = "WHIRLWIND", -- Fury
         },
     }
 
