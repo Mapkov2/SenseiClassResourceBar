@@ -778,7 +778,7 @@ function BarMixin:ApplyMaskAndBorderSettings(layoutName, data)
         -- Linear multiplier: for example, thickness grows 1x at scale 1, 2x at scale 2
         local thickness = (style.thickness or 1) * math.max(data.scale or defaults.scale, 1)
         local ppScale = addonTable.getPixelPerfectScale()
-        local pThickness = math.max(addonTable.rounded(thickness), 1) * ppScale
+        local pThickness = math.max(1, math.max(addonTable.rounded(thickness), 1) * ppScale)
 
         local borderColor = data.borderColor or defaults.borderColor
 
