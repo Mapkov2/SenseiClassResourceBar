@@ -145,8 +145,14 @@ function SecondaryResourceBarMixin:GetResourceValue(resource)
     end
 
     if resource == Enum.PowerType.SoulShards then
-        local current = UnitPower("player", resource, true)
-        local max = UnitPowerMax("player", resource, true)
+        local spec = C_SpecializationInfo.GetSpecialization()
+        local specID = C_SpecializationInfo.GetSpecializationInfo(spec)
+
+        -- If true, current and max will be something like 14 for 1.4 shard, instead of 1
+        local preciseResourceCount = specID == 267
+
+        local current = UnitPower("player", resource, preciseResourceCount)
+        local max = UnitPowerMax("player", resource, preciseResourceCount)
         if max <= 0 then return nil, nil end
 
         return max, current
@@ -191,14 +197,18 @@ function SecondaryResourceBarMixin:GetTagValues(resource, max, current, precisio
     end
 
     if resource == Enum.PowerType.SoulShards then
-        local currentStr = string.format("%s", AbbreviateNumbers(current / 10))
-        local percentStr = string.format(pFormat, UnitPowerPercent("player", resource, true, CurveConstants.ScaleTo100))
-        local maxStr = string.format("%s", AbbreviateNumbers(max / 10))
-        tagValues = {
-            ["[current]"] = function() return currentStr end,
-            ["[percent]"] = function() return percentStr end,
-            ["[max]"] = function() return maxStr end,
-        }
+        local spec = C_SpecializationInfo.GetSpecialization()
+        local specID = C_SpecializationInfo.GetSpecializationInfo(spec)
+
+        if specID == 267 then
+            current = current / 10
+            max = max / 10
+        end
+
+        local currentStr = string.format("%s", AbbreviateNumbers(current))
+        local maxStr = string.format("%s", AbbreviateNumbers(max))
+        tagValues["[current]"] = function() return currentStr end
+        tagValues["[max]"] = function() return maxStr end
     end
 
     if resource == "MAELSTROM_WEAPON" then
